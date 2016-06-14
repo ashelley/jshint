@@ -75,7 +75,9 @@ var errors = {
   E057: "Invalid meta property: '{a}.{b}'.",
   E058: "Missing semicolon.",
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
-  E060: "Non-callable values cannot be used as the second operand to instanceof."
+  E060: "Non-callable values cannot be used as the second operand to instanceof.",
+  E901: "Implicit class does not need a class delcaration",
+  E902: "Only methods can be defined in implicit class declarations"  
 };
 
 var warnings = {

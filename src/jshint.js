@@ -870,7 +870,9 @@ var JSHINT = (function() {
     if (isDangerous)
       warning("W014", state.tokens.curr, state.tokens.curr.id);
 
-    advance();
+    if(state.tokens.curr.id != "(implicitclass)") {
+      advance();      
+    }
 
     if (initial) {
       state.funct["(verb)"] = state.tokens.curr.value;
@@ -1641,7 +1643,7 @@ var JSHINT = (function() {
 
     // Look for the final semicolon.
 
-    if (!t.block) {
+    if (!t.block && (!r || r.id != "(implicitclass)")) {
       if (!state.option.expr && (!r || !r.exps)) {
         warning("W030", state.tokens.curr);
       } else if (state.option.nonew && r && r.left && r.id === "(" && r.left.id === "new") {
@@ -3341,6 +3343,144 @@ var JSHINT = (function() {
       error("E036", state.tokens.curr);
     };
   }(delim("{")));
+  
+  (function(x) {
+    x.fud = function() {
+      var b, f, i, p, t, isGeneratorMethod = false, nextVal;
+      var props = Object.create(null); // All properties, including accessors
+
+      b = state.tokens.curr.line !== startLine(state.tokens.next);
+      if (b) {
+        indent += state.option.indent;
+        if (state.tokens.next.from === indent + state.option.indent) {
+          indent += state.option.indent;
+        }
+      }
+
+      var blocktype = lookupBlockType();
+      if (blocktype.isDestAssign) {
+        this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
+        return this;
+      }
+      
+			if(state.tokens.next.value == "class") {
+				error("E901")
+				advance("(end)", this)
+			}      
+
+      for (;;) {
+        if (state.tokens.next.type == "(end)") {
+          break;
+        }
+        
+				if(state.tokens.next.identifier) {
+					if(peek().value != "(") {
+						error("E902")
+					}
+				}          
+
+        nextVal = state.tokens.next.value;
+        if (state.tokens.next.identifier &&
+            (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
+          if (!state.inES6()) {
+            warning("W104", state.tokens.next, "object short notation", "6");
+          }
+          i = propertyName(true);
+          saveProperty(props, i, state.tokens.next);
+
+          expression(10);
+
+        } else if (peek().id !== ":" && (nextVal === "get" || nextVal === "set")) {
+          advance(nextVal);
+
+          if (!state.inES5()) {
+            error("E034");
+          }
+
+          i = propertyName();
+
+          // ES6 allows for get() {...} and set() {...} method
+          // definition shorthand syntax, so we don't produce an error
+          // if linting ECMAScript 6 code.
+          if (!i && !state.inES6()) {
+            error("E035");
+          }
+
+          // We don't want to save this getter unless it's an actual getter
+          // and not an ES6 concise method
+          if (i) {
+            saveAccessor(nextVal, props, i, state.tokens.curr);
+          }
+
+          t = state.tokens.next;
+          f = doFunction();
+          p = f["(params)"];
+
+          // Don't warn about getter/setter pairs if this is an ES6 concise method
+          if (nextVal === "get" && i && p) {
+            warning("W076", t, p[0], i);
+          } else if (nextVal === "set" && i && f["(metrics)"].arity !== 1) {
+            warning("W077", t, i);
+          }
+        } else {
+          if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
+            if (!state.inES6()) {
+              warning("W104", state.tokens.next, "generator functions", "6");
+            }
+            advance("*");
+            isGeneratorMethod = true;
+          } else {
+            isGeneratorMethod = false;
+          }
+
+          if (state.tokens.next.id === "[") {
+            i = computedPropertyName();
+            state.nameStack.set(i);
+          } else {
+            state.nameStack.set(state.tokens.next);
+            i = propertyName();
+            saveProperty(props, i, state.tokens.next);
+
+            if (typeof i !== "string") {
+              break;
+            }
+          }
+
+          if (state.tokens.next.value === "(") {
+            if (!state.inES6()) {
+              warning("W104", state.tokens.curr, "concise methods", "6");
+            }
+            doFunction({ type: isGeneratorMethod ? "generator" : null });
+          } else {
+            advance(":");
+            expression(10);
+          }
+        }
+
+        countMember(i);
+
+        if (state.tokens.next.id === ",") {
+          parseComma({ allowTrailing: true, property: true });
+          if (state.tokens.next.id === ",") {
+            warning("W070", state.tokens.curr);
+          } else if (state.tokens.next.id === "}" && !state.inES5()) {
+            warning("W070", state.tokens.curr);
+          }
+        } else {
+          //break;
+        }
+      }
+      if (b) {
+        indent -= state.option.indent;
+      }
+      if(state.tokens.next.id != "(end)") {
+        advance("(end)", this);        
+      }
+      checkProperties(props);
+
+      return this;
+    };
+  }(delim("(implicitclass)")));    
 
   function destructuringPattern(options) {
     var isAssignment = options && options.assignment;
@@ -5225,7 +5365,11 @@ var JSHINT = (function() {
       func(api);
     });
 
-    state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];
+    if(state.option.implicitClass) {
+      state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(implicitclass)"];
+    } else {
+      state.tokens.prev = state.tokens.curr = state.tokens.next = state.syntax["(begin)"];      
+    }
 
     if (o && o.ignoreDelimiters) {
 

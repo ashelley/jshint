@@ -557,6 +557,12 @@ exports.bool = {
      * or empty elements (for example, `[1, , , 4, , , 7]`).
      */
     elision     : true,
+    
+    /**
+     * Allow for implicit class
+     *
+     */
+    implicitClass     : true,    
   },
 
   // Third party globals

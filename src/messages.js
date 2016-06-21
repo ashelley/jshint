@@ -77,7 +77,8 @@ var errors = {
   E059: "Incompatible values for the '{a}' and '{b}' linting options.",
   E060: "Non-callable values cannot be used as the second operand to instanceof.",
   E901: "Implicit class does not need a class delcaration",
-  E902: "Only methods can be defined in implicit class declarations"  
+  E902: "Only methods can be defined in implicit class declarations",
+  E903: "Decorator expression can only be one line"
 };
 
 var warnings = {
@@ -223,7 +224,8 @@ var warnings = {
   W136: "'{a}' must be in function scope.",
   W137: "Empty destructuring.",
   W138: "Regular parameters should not come after default parameters.",
-  W139: "Function expressions should not be used as the second operand to instanceof."
+  W139: "Function expressions should not be used as the second operand to instanceof.",
+  W900: "Decorator has missing identifier"
 };
 
 var info = {

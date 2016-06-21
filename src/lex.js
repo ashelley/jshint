@@ -32,7 +32,8 @@ var Token = {
   TemplateHead: 10,
   TemplateMiddle: 11,
   TemplateTail: 12,
-  NoSubstTemplate: 13
+  NoSubstTemplate: 13,
+  Decorator: 55
 };
 
 var Context = {
@@ -246,6 +247,7 @@ Lexer.prototype = {
     case ":":
     case "~":
     case "?":
+    case "@":
       return {
         type: Token.Punctuator,
         value: ch1
@@ -1844,6 +1846,14 @@ Lexer.prototype = {
         }
 
         break;
+      case Token.Decorator:
+        return {
+          id: '(decorator)',
+          value: token.value,
+          line: this.line,
+          character: this.char,
+          from: this.from
+        }
 
       case "":
         break;

@@ -938,6 +938,36 @@ var JSHINT = (function() {
 
 
   // Functions for conformance of style.
+  
+  function decorator() {
+    var t = state.tokens.next;
+    if(t.value != "@" || t.type != "(punctuator)") {
+      return;
+    }
+    var i = 0;
+    var decoratorName;
+    var c = peek(i);
+    if(startLine(t) == startLine(c)) {
+      i++;
+      if(!c.identifier) {
+        warning("W900", c)
+      } else {
+        decoratorName = c.identifier;
+        var fn = peek(i);
+        if(startLine(t) == startLine(fn)) {
+          if(fn.type != "punctuator" && fn.value != "(") {
+            warning("W900", c)       
+          }                                      
+        }
+      }
+    } 
+    if(!decoratorName) {
+      warning("W900", t);
+    }
+    while(startLine(t) == startLine(state.tokens.next)) {
+      advance();
+    }      
+  }
 
   function startLine(token) {
     return token.startLine || token.line;
@@ -1990,6 +2020,7 @@ var JSHINT = (function() {
   delim(";");
   delim(":").reach = true;
   delim("#");
+  delim("@");
 
   reserve("else");
   reserve("case").reach = true;
@@ -3373,11 +3404,9 @@ var JSHINT = (function() {
           break;
         }
         
-				if(state.tokens.next.identifier) {
-					if(peek().value != "(") {
-						error("E902")
-					}
-				}          
+        if(state.tokens.next.value === "@" && state.tokens.next.type == "(punctuator)") {
+          decorator();
+        }                             
 
         nextVal = state.tokens.next.value;
         if (state.tokens.next.identifier &&
@@ -3426,16 +3455,18 @@ var JSHINT = (function() {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
             if (!state.inES6()) {
               warning("W104", state.tokens.next, "generator functions", "6");
-            }
+            }            
             advance("*");
             isGeneratorMethod = true;
           } else {
             isGeneratorMethod = false;
-          }
+          }          
 
           if (state.tokens.next.id === "[") {
             i = computedPropertyName();
             state.nameStack.set(i);
+          } else if(state.tokens.next.id == '(decorator)') {
+           
           } else {
             state.nameStack.set(state.tokens.next);
             i = propertyName();
@@ -3480,8 +3511,8 @@ var JSHINT = (function() {
 
       return this;
     };
-  }(delim("(implicitclass)")));    
-
+  }(delim("(implicitclass)")));
+ 
   function destructuringPattern(options) {
     var isAssignment = options && options.assignment;
 
@@ -5069,7 +5100,7 @@ var JSHINT = (function() {
       return (l === 0);
     }
     return { stack: function() {
-          _current = new CompArray();
+          _current = CompArray();
           _carrays.push(_current);
         },
         unstack: function() {

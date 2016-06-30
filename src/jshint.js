@@ -3406,7 +3406,11 @@ var JSHINT = (function() {
         
         if(state.tokens.next.value === "@" && state.tokens.next.type == "(punctuator)") {
           decorator();
-        }                             
+        }  
+        
+        if(state.tokens.next.value === 'static') {
+          advance();
+        }                           
 
         nextVal = state.tokens.next.value;
         if (state.tokens.next.identifier &&
@@ -3467,7 +3471,7 @@ var JSHINT = (function() {
             state.nameStack.set(i);
           } else if(state.tokens.next.id == '(decorator)') {
            
-          } else {
+          } else {            
             state.nameStack.set(state.tokens.next);
             i = propertyName();
             saveProperty(props, i, state.tokens.next);

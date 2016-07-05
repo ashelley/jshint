@@ -4,7 +4,10 @@
 
 "use strict";
 
-var _      = require("lodash");
+var _      = {
+  some: require("lodash/some"),
+  has: require("lodash/has") 
+}
 var events = require("events");
 var reg    = require("./reg.js");
 var state  = require("./state.js").state;

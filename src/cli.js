@@ -1,6 +1,11 @@
 "use strict";
 
-var _                 = require("lodash");
+var _                 = {
+  each: require("lodash/each"),
+  extend: require("lodash/extend"),
+  merge: require("lodash/merge"),
+  isArray: require("lodash/isArray")
+}
 var fs                = require("fs");
 var cli               = require("cli");
 var path              = require("path");

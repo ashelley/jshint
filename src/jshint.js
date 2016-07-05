@@ -32,7 +32,17 @@
 /*global console:true */
 /*exported console */
 
-var _            = require("lodash");
+var _            = {
+  has: require("lodash/has"),  
+  isEmpty: require("lodash/isEmpty"),
+  reject: require("lodash/reject"),
+  contains: require("lodash/fp/contains"),
+  extend: require("lodash/extend"),
+  isNumber: require("lodash/isNumber"),
+  zip: require("lodash/zip"),
+  each: require("lodash/each"),
+  clone: require("lodash/clone")
+}
 var events       = require("events");
 var vars         = require("./vars.js");
 var messages     = require("./messages.js");

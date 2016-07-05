@@ -1,6 +1,12 @@
 "use strict";
 
-var _      = require("lodash");
+var _      = {
+  slice: require("lodash/slice"),
+  has: require("lodash/has"),
+  find: require("lodash/find"),
+  values: require("lodash/values"),
+  findLastIndex: require("lodash/findLastIndex")   
+}
 var events = require("events");
 
 // Used to denote membership in lookup tables (a primitive value such as `true`

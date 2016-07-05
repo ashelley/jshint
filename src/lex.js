@@ -12,8 +12,6 @@ var state  = require("./state.js").state;
 var unicodeData = require("../data/ascii-identifier-data.js");
 var asciiIdentifierStartTable = unicodeData.asciiIdentifierStartTable;
 var asciiIdentifierPartTable = unicodeData.asciiIdentifierPartTable;
-var nonAsciiIdentifierStartTable = require("../data/non-ascii-identifier-start.js");
-var nonAsciiIdentifierPartTable = require("../data/non-ascii-identifier-part-only.js");
 
 // Some of these token types are from JavaScript Parser API
 // while others are specific to JSHint parser.
@@ -579,14 +577,6 @@ Lexer.prototype = {
     var index = 0;
     var type, char;
 
-    function isNonAsciiIdentifierStart(code) {
-      return nonAsciiIdentifierStartTable.indexOf(code) > -1;
-    }
-
-    function isNonAsciiIdentifierPart(code) {
-      return isNonAsciiIdentifierStart(code) || nonAsciiIdentifierPartTable.indexOf(code) > -1;
-    }
-
     function isHexDigit(str) {
       return (/^[0-9a-fA-F]$/).test(str);
     }
@@ -608,7 +598,7 @@ Lexer.prototype = {
       if (isHexDigit(ch1) && isHexDigit(ch2) && isHexDigit(ch3) && isHexDigit(ch4)) {
         code = parseInt(ch1 + ch2 + ch3 + ch4, 16);
 
-        if (asciiIdentifierPartTable[code] || isNonAsciiIdentifierPart(code)) {
+        if (asciiIdentifierPartTable[code]) {
           index += 5;
           return "\\u" + ch1 + ch2 + ch3 + ch4;
         }
@@ -637,11 +627,6 @@ Lexer.prototype = {
         return null;
       }
 
-      if (isNonAsciiIdentifierStart(code)) {
-        index += 1;
-        return chr;
-      }
-
       return null;
     }.bind(this);
 
@@ -661,11 +646,6 @@ Lexer.prototype = {
         }
 
         return null;
-      }
-
-      if (isNonAsciiIdentifierPart(code)) {
-        index += 1;
-        return chr;
       }
 
       return null;

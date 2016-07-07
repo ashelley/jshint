@@ -3416,7 +3416,11 @@ var JSHINT = (function() {
         
         if(state.tokens.next.value === "@" && state.tokens.next.type == "(punctuator)") {
           decorator();
-        }  
+        }
+        
+        if(state.tokens.next.value === 'public' || state.tokens.next.value == "private") {
+          advance();
+        }            
         
         if(state.tokens.next.value === 'static') {
           advance();
@@ -3496,7 +3500,11 @@ var JSHINT = (function() {
               warning("W104", state.tokens.curr, "concise methods", "6");
             }
             doFunction({ type: isGeneratorMethod ? "generator" : null });
-          } else {
+          } 
+          else if (state.tokens.next.value === ";"){
+            advance();
+          }           
+          else {
             advance(":");
             expression(10);
           }

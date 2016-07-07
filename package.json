@@ -1,6 +1,6 @@
 {
   "name": "@retool/jshint",
-  "version": "2.9.2-patch1",
+  "version": "2.9.2-patch2",
   "homepage": "http://jshint.com/",
   "description": "Static analysis tool for JavaScript",
   "author": {
